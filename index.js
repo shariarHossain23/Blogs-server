@@ -17,7 +17,7 @@ const verifyJwt = (req,res,next) => {
     res.status("403").send({message:"unauthorized access "})
   }
 
-  const token = authHeader.split(" ")[0];
+  const token = authHeader.split(" ")[1];
   jwt.verify(token,process.env.JWT_TOKEN,(err,decoded)=>{
     if(err){
       res.status(401).send({message: "forbidden acces"})
@@ -39,9 +39,13 @@ async function run() {
 
 
 
-      // get all blogs
+     
       app.get('/blog',verifyJwt,async(req,res)=>{
         const result = await blogCollection.find().toArray()
+        res.send(result)
+      })
+      app.get('/recent',async(req,res)=>{
+        const result = await (await blogCollection.find().toArray()).reverse()
         res.send(result)
       })
       // post user 
