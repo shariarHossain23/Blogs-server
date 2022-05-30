@@ -20,7 +20,17 @@ async function run() {
     try {
       await client.connect();
       const blogsUser = client.db("Blogs").collection("user");
+      const blogCollection = client.db("Blogs").collection("blog")
 
+
+
+      // post user 
+      app.post('/blog',async(req,res)=> {
+        const blog = req.body;
+        const result = await blogCollection.insertOne(blog);
+        res.send(result)
+      })
+      // put all user
       app.put('/user/:email',async(req,res)=>{
           const email = req.params.email;
           const user = req.body;
