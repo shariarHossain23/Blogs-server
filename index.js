@@ -11,7 +11,21 @@ const port =process.env.PORT || 5000
 app.use(cors())
 app.use(express.json())
 
+const verifyJwt = (req,res,next) => {
+  const authHeader = req.headers.authorization;
+  if(!authHeader){
+    res.status("403").send({message:"unauthorized access "})
+  }
 
+  const token = authHeader.split(" ")[0];
+  jwt.verify(token,process.env.JWT_TOKEN,(err,decoded)=>{
+    if(err){
+      res.status(401).send({message: "forbidden acces"})
+    }
+    req.decoded = decoded;
+    next()
+  })
+}
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.plsay.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
@@ -24,11 +38,16 @@ async function run() {
 
 
 
+
+      // get all blogs
+      app.get('/blog',async(req,res)=>{
+        
+      })
       // post user 
       app.post('/blog',async(req,res)=> {
         const blog = req.body;
         const result = await blogCollection.insertOne(blog);
-        res.send(result)
+        res.send(result )
       })
       // put all user
       app.put('/user/:email',async(req,res)=>{
