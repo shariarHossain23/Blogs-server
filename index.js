@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors')
 var jwt = require('jsonwebtoken');
 require('dotenv').config()
@@ -44,8 +44,14 @@ async function run() {
         const result = await blogCollection.find().toArray()
         res.send(result)
       })
+      app.get('/blog/:id',verifyJwt,async(req,res)=>{
+        const id = req.params.id;
+        const filterId = {_id:ObjectId(id)}
+        const result = await blogCollection.findOne(filterId)
+        res.send(result)
+      })
       app.get('/recent',async(req,res)=>{
-        const result = await (await blogCollection.find().toArray()).reverse()
+        const result =  (await blogCollection.find().toArray()).reverse()
         res.send(result)
       })
       // post user 
