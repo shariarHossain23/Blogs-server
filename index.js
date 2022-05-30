@@ -38,7 +38,17 @@ async function run() {
 
 
 
-
+      // 
+      app.put("/user/:email",async(req,res)=>{
+        const email = req.params.email;
+        const user = req.body
+        const filter = {email:email}
+        const updateDoc ={
+          $set:user,
+        }
+        const result = await blogsUser.updateOne(filter,updateDoc)
+        res.send(result)
+      })
       app.delete('/blogs/:id',verifyJwt,async(req,res)=>{
         const id = req.params.id;
         const filter = {_id:ObjectId(id)}
@@ -48,17 +58,11 @@ async function run() {
       // specefic user post
       app.get('/users/:email',verifyJwt,async(req,res)=>{
         const email = req.params.email;
-        const decoded = req.decoded.email
-        console.log(decoded);
-        if(decoded === email){
+      
           const filter = {email:email}
           const blogs =blogCollection.find(filter)
           const result = await blogs.toArray()
           res.send(result)
-        }
-        else{
-          res.status(401).send({message: "forbidden access"})
-        }
        
       })
       // get all user
