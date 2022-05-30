@@ -40,8 +40,9 @@ async function run() {
 
 
       // get all blogs
-      app.get('/blog',async(req,res)=>{
-        
+      app.get('/blog',verifyJwt,async(req,res)=>{
+        const result = await blogCollection.find().toArray()
+        res.send(result)
       })
       // post user 
       app.post('/blog',async(req,res)=> {
