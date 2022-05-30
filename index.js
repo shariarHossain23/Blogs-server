@@ -14,13 +14,13 @@ app.use(express.json())
 const verifyJwt = (req,res,next) => {
   const authHeader = req.headers.authorization;
   if(!authHeader){
-    res.status("403").send({message:"unauthorized access "})
+    res.status(403).send({message:"unauthorized access "})
   }
 
   const token = authHeader.split(" ")[1];
   jwt.verify(token,process.env.JWT_TOKEN,(err,decoded)=>{
     if(err){
-      res.status(401).send({message: "forbidden acces"})
+      res.status(401).send({message: "forbidden access"})
     }
     req.decoded = decoded;
     next()
@@ -39,25 +39,41 @@ async function run() {
 
 
 
-     
-      // specefic user post
-      app.get('/users/:email',async(req,res)=>{
-        const email = req.params.email;
-        const filter = {email:email}
-        const blogs =blogCollection.find(filter)
-        const result = await blogs.toArray()
+      app.delete('/blogs/:id',verifyJwt,async(req,res)=>{
+        const id = req.params.id;
+        const filter = {_id:ObjectId(id)}
+        const result = blogCollection.deleteOne(filter)
         res.send(result)
       })
-      app.get('/blog',async(req,res)=>{
+      // specefic user post
+      app.get('/users/:email',verifyJwt,async(req,res)=>{
+        const email = req.params.email;
+        const decoded = req.decoded.email
+        console.log(decoded);
+        if(decoded === email){
+          const filter = {email:email}
+          const blogs =blogCollection.find(filter)
+          const result = await blogs.toArray()
+          res.send(result)
+        }
+        else{
+          res.status(401).send({message: "forbidden access"})
+        }
+       
+      })
+      // get all user
+      app.get('/blog',verifyJwt,async(req,res)=>{
         const result = await blogCollection.find().toArray()
         res.send(result)
       })
+      // specific blog
       app.get('/blog/:id',async(req,res)=>{
         const id = req.params.id;
         const filterId = {_id:ObjectId(id)}
         const result = await blogCollection.findOne(filterId)
         res.send(result)
       })
+      // recent blog post
       app.get('/recent',async(req,res)=>{
         const result =  (await blogCollection.find().toArray()).reverse()
         res.send(result)
