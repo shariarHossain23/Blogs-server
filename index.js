@@ -40,11 +40,19 @@ async function run() {
 
 
      
-      app.get('/blog',verifyJwt,async(req,res)=>{
+      // specefic user post
+      app.get('/users/:email',async(req,res)=>{
+        const email = req.params.email;
+        const filter = {email:email}
+        const blogs =blogCollection.find(filter)
+        const result = await blogs.toArray()
+        res.send(result)
+      })
+      app.get('/blog',async(req,res)=>{
         const result = await blogCollection.find().toArray()
         res.send(result)
       })
-      app.get('/blog/:id',verifyJwt,async(req,res)=>{
+      app.get('/blog/:id',async(req,res)=>{
         const id = req.params.id;
         const filterId = {_id:ObjectId(id)}
         const result = await blogCollection.findOne(filterId)
