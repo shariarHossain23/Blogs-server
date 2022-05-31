@@ -40,7 +40,15 @@ async function run() {
     const blogsUser = client.db("Blogs").collection("user");
     const blogCollection = client.db("Blogs").collection("blog");
 
-    //
+
+    // get user data specific
+    app.get('/userData/:email',verifyJwt,async(req,res)=>{
+      const email = req.params.email;
+      const filter = {email:email};
+      const result = await blogsUser.findOne(filter)
+      res.send(result)
+    })
+    // update user
     app.patch("/user/:email", async (req, res) => {
       const email = req.params.email;
       console.log(email);
