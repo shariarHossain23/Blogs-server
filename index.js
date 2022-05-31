@@ -59,14 +59,19 @@ async function run() {
       res.send(result);
     });
     // specefic user post
-    app.get("/blogsuserspost/:email", async (req, res) => {
+    app.get("/blogsuserspost/:email",verifyJwt, async (req, res) => {
       const email = req.params.email;
-      // const decodedEmail = req.decoded.email
-      // console.log(decodedEmail);
-      const filter = { email: email };
-      const blogs = blogCollection.find(filter);
-      const result = await blogs.toArray();
-      res.send(result);
+      const decodedEmail = req.decoded.email
+      if(decodedEmail === email){
+        const filter = { email: email };
+        const blogs = blogCollection.find(filter);
+        const result = await blogs.toArray();
+        res.send(result);
+      }
+      else{
+        return res.status(403).send({ message: "forbidden access" });
+      }
+     
     });
     // get all user
     app.get("/blog", async (req, res) => {
